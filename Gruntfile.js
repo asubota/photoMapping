@@ -13,21 +13,17 @@ module.exports = function(grunt) {
         main: 'app/css/main.css',
         all:  ['app/css/*.css']
       },
-      less: {
-        main: 'app/less/main.less'
-      },
-      build: {
-        lib: 'app/build/lib.min.js',
-        app: 'app/build/application.min.js',
-        css: 'app/build/application.css'
-      },
-      'public': {
-        lib: 'public/javascripts/lib.min.js',
-        app: 'public/javascripts/application.min.js',
-        css: 'public/stylesheets/application.css'
-      }
-    },
+      less: ['app/less/*.less'],
+      index: 'app/index.html',
 
+      build: {
+        lib: 'build/lib.min.js',
+        app: 'build/application.min.js',
+        css: 'build/application.css',
+        idx: 'build/index.html'
+      },
+    },
+  
     uglify: {
       options: {
         banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */\n'
@@ -75,28 +71,45 @@ module.exports = function(grunt) {
           report: 'min'
         },
         files: {
-          '<%= files.css.main %>': '<%= files.less.main %>'
+          '<%= files.css.main %>': '<%= files.less %>'
         }
       }
     },
 
     copy: {
+      fonts: {
+        files: [
+          {
+            expand: true,
+            cwd: 'app/fonts/',
+            src: ['**/*.*'],
+            dest:'build/fonts/'
+          }
+        ]
+      },
+      images: {
+        files: [
+          {
+            expand: true,
+            cwd: 'app/images/',
+            src: ['**/*.*'],
+            dest:'build/images/'
+          }
+        ]
+      },
       main: {
         files: [
-          { src: '<%= files.build.css %>', dest: '<%= files.public.css %>' },
-          { src: '<%= files.build.app %>', dest: '<%= files.public.app %>' },
-          { src: '<%= files.build.lib %>', dest: '<%= files.public.lib %>' },
+          { src: '<%= files.index %>',     dest: '<%= files.build.idx %>' },
         ]
       }
     },
 
     watch: {
-      files: ['<%= files.js.main %>', '<%= files.less.main %>'],
+      files: ['<%= files.js.main %>', '<%= files.less %>', 'files.index'],
       tasks: ['jshint', 'uglify', 'less', 'concat', 'copy']
     }
 
   });
-
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-concat');

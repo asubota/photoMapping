@@ -4,5 +4,5 @@
  */
 
 exports.index = function(req, res){
-  res.send('Hello Wordl');
+  res.send('Please, navigate to index.html page');
 };
