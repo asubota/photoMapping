@@ -1,81 +1,111 @@
-/*global module:false*/
 module.exports = function(grunt) {
 
-  // Project configuration.
   grunt.initConfig({
-    // Metadata.
+
     pkg: grunt.file.readJSON('package.json'),
-    banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
-      '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-      '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
-      '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-      ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n',
-    // Task configuration.
-    concat: {
-      options: {
-        banner: '<%= banner %>',
-        stripBanners: true
+
+    files: {
+      js: {
+        main: 'app/js/main.js',
+        vendor: ['app/vendor/*.js']
       },
-      dist: {
-        src: ['lib/<%= pkg.name %>.js'],
-        dest: 'dist/<%= pkg.name %>.js'
+      css: {
+        main: 'app/css/main.css',
+        all:  ['app/css/*.css']
+      },
+      less: {
+        main: 'app/less/main.less'
+      },
+      build: {
+        lib: 'app/build/lib.min.js',
+        app: 'app/build/application.min.js',
+        css: 'app/build/application.css'
+      },
+      'public': {
+        lib: 'public/javascripts/lib.min.js',
+        app: 'public/javascripts/application.min.js',
+        css: 'public/stylesheets/application.css'
       }
     },
+
     uglify: {
       options: {
-        banner: '<%= banner %>'
+        banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */\n'
       },
-      dist: {
-        src: '<%= concat.dist.dest %>',
-        dest: 'dist/<%= pkg.name %>.min.js'
+      '<%= files.build.app %>': '<%= files.js.main %>'
+    },
+
+    concat: {
+      options: {
+        separator: ';',
+        stripBanners: true
+      },
+      js: {
+        src: '<%= files.js.vendor %>',
+        dest: '<%= files.build.lib %>'
+      },
+      css: {
+        src: '<%= files.css.all %>',
+        dest: '<%= files.build.css %>'
       }
     },
+
     jshint: {
       options: {
         curly: true,
+        eqnull: true,
         eqeqeq: true,
+        boss: true,
+        lastsemic: true,
+        loopfunc: true,
+        trailing: true,
         immed: true,
-        latedef: true,
         newcap: true,
         noarg: true,
-        sub: true,
-        undef: true,
-        unused: true,
-        boss: true,
-        eqnull: true,
-        browser: true,
-        globals: {}
+        sub: true
       },
-      gruntfile: {
-        src: 'Gruntfile.js'
-      },
-      lib_test: {
-        src: ['lib/**/*.js', 'test/**/*.js']
+      files: ['Gruntfile.js', '<%= files.js.main %>']
+    },
+
+    less: {
+      development: {
+        options: {
+          cleancss: true,
+          compress: true,
+          report: 'min'
+        },
+        files: {
+          '<%= files.css.main %>': '<%= files.less.main %>'
+        }
       }
     },
-    qunit: {
-      files: ['test/**/*.html']
+
+    copy: {
+      main: {
+        files: [
+          { src: '<%= files.build.css %>', dest: '<%= files.public.css %>' },
+          { src: '<%= files.build.app %>', dest: '<%= files.public.app %>' },
+          { src: '<%= files.build.lib %>', dest: '<%= files.public.lib %>' },
+        ]
+      }
     },
+
     watch: {
-      gruntfile: {
-        files: '<%= jshint.gruntfile.src %>',
-        tasks: ['jshint:gruntfile']
-      },
-      lib_test: {
-        files: '<%= jshint.lib_test.src %>',
-        tasks: ['jshint:lib_test', 'qunit']
-      }
+      files: ['<%= files.js.main %>', '<%= files.less.main %>'],
+      tasks: ['jshint', 'uglify', 'less', 'concat', 'copy']
     }
+
   });
 
-  // These plugins provide necessary tasks.
-  grunt.loadNpmTasks('grunt-contrib-concat');
+
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-qunit');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-contrib-copy');
 
-  // Default task.
-  grunt.registerTask('default', ['jshint', 'qunit', 'concat', 'uglify']);
-
+  // Default task(s).
+  grunt.registerTask('default', ['jshint', 'uglify', 'less', 'concat', 'copy']);
+  grunt.registerTask('dev', ['watch']);
 };
