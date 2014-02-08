@@ -1,0 +1,32 @@
+{
+  "name": "photoMapping",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "3.4.8"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.2"
+  },
+  "description": "Places markers on leaflet driven map based on photo's EXIF data",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/asubota/photoMapping.git"
+  },
+  "keywords": [
+    "leaflet",
+    "map",
+    "geocoding",
+    "EXIF"
+  ],
+  "author": "Alexander Subota",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/asubota/photoMapping/issues"
+  },
+  "homepage": "https://github.com/asubota/photoMapping"
+}
