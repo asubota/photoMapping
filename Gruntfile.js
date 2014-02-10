@@ -17,9 +17,9 @@ module.exports = function(grunt) {
       index: 'app/index.html',
 
       build: {
-        lib: 'build/lib.min.js',
-        app: 'build/application.min.js',
-        css: 'build/application.css',
+        lib: 'build/javascripts/lib.min.js',
+        app: 'build/javascripts/application.min.js',
+        css: 'build/stylesheets/application.css',
         idx: 'build/index.html'
       },
     },
@@ -105,7 +105,7 @@ module.exports = function(grunt) {
     },
 
     watch: {
-      files: ['<%= files.js.main %>', '<%= files.less %>', 'files.index'],
+      files: ['<%= files.js.main %>', '<%= files.less %>', '<%= files.index %>'],
       tasks: ['jshint', 'uglify', 'less', 'concat', 'copy']
     }
 
