@@ -8,12 +8,13 @@
     <meta name="author" content="">
 
     <link href="/stylesheets/application.css" rel="stylesheet">
-
+    <script src="/javascripts/lib.min.js"></script>
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 </head>
+
 
 <body>
 
@@ -21,29 +22,25 @@
     <div id="content">
 
 
-
-
-        <div class="ui segment2">
-            <div class="four item tabular ui menu">
-                <a class="item active" data-tab="t1">t1</a>
-                <a class="item" data-tab="t2">t2</a>
-           </div>
-
-            <div class="ui tab" data-tab="t1"></div>
-            <div class="ui tab" data-tab="t2"></div>
-
-
-            <h3 class="ui right floated header">
-                Map
-            </h3>
+        <div class="ui pointing secondary menu">
+            <a class="red item" data-tab="map">Map</a>
+            <a class="blue item" data-tab="photo">Photo</a>
+        </div>
+        <div class="ui tab segment" data-tab="map">
             <div id="map"></div>
+        </div>
+        <div class="ui tab segment" data-tab="photo">
+            list of photos, upload field, etc....
+
+            <div class="ui divider"></div>
         </div>
 
     </div>
 </div>
 
 
-<script src="/javascripts/lib.min.js"></script>
+
+
 <script src="/javascripts/application.min.js"></script>
 </body>
 </html>
