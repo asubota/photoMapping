@@ -7,7 +7,10 @@ module.exports = function(grunt) {
     files: {
       js: {
         main: 'app/js/main.js',
-        vendor: ['app/vendor/*.js']
+        vendor: [
+          'app/vendor/jquery-2.1.0.min.js',
+          'app/vendor/*.js',
+        ]
       },
       css: {
         main: 'app/css/main.css',
