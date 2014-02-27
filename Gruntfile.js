@@ -36,7 +36,7 @@ module.exports = function(grunt) {
 
     concat: {
       options: {
-        separator: ';',
+        separator: ";",
         stripBanners: true
       },
       js: {

@@ -19,30 +19,57 @@
 <body>
 
 <div id="wrap">
-    <div id="content" class="ui grid">
+    <div id="content" class="ui grid ">
 
-        <div class="row">
+        <div class="row first ">
             <div class="one wide column"></div>
-            <div class="fourteen wide column">
+           
+            <div class="three wide column">
                 <div class="ui segment">
-                    <h3 class="ui right floated header">Map</h3>
+                    <div class="ui pointing secondary menu">
+                        <a class="red item" data-tab="map">Map</a>
+                        <a class="blue item" data-tab="photo">Photo</a>
+                    </div>
                 </div>
             </div>
+            
+            <div class="eight wide column"></div>
+
+            <div class="three wide column">
+                <div class="ui segment">
+                    <h3 class="ui header">Map</h3>
+                </div>
+            </div>
+
             <div class="one wide column"></div>
         </div>
+        
 
-        <div class="row">
+
+
+
+        <div class="row second">
             <div class="one wide column"></div>
             <div class="fourteen wide column">
-                <div class="ui segment">
+       
+                <div class="ui tab segment" data-tab="map">
                     <div id="map"></div>
                 </div>
+
+                <div class="ui tab segment" data-tab="photo">
+                    list of photos, upload field, etc....
+                </div>
+
+
+
             </div>
             <div class="one wide column"></div>
         </div>
 
     </div>
 </div>
+
+
 
 
 <script src="/javascripts/application.min.js"></script>
