@@ -9,6 +9,7 @@ module.exports = function(grunt) {
         main: 'app/js/main.js',
         vendor: [
           'app/vendor/jquery-2.1.0.min.js',
+          'app/vendor/underscore-min.js',
           'app/vendor/*.js',
         ]
       },
@@ -26,7 +27,7 @@ module.exports = function(grunt) {
         idx: 'build/index.html'
       },
     },
-  
+
     uglify: {
       options: {
         banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */\n'
