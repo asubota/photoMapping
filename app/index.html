@@ -57,10 +57,11 @@
       </div>
 
       <div class="ui tab segment" data-tab="photo">
-        <form method='post' action='/upload' enctype='multipart/form-data'>
-          <input type='file' name='image'/>
-          <input type='submit' />
-        </form>
+        <label for="image"><div class="ui button mini orange">Select file</div></label>
+        <div class="ui button mini blue">Upload</div>
+        <div class="hidden-upload-field">
+          <input id="image" name="image" type="file">
+        </div>
       </div>
 
     </div>
