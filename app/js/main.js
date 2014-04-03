@@ -11,6 +11,9 @@ $(function() {
   $('#content .menu .item').tab();
   $('.ui.checkbox').checkbox();
 
+
+
+
   var MapView = Backbone.View.extend({
     el: $('body'),
 
@@ -21,6 +24,8 @@ $(function() {
 
     events: {
       'click .ph-markers-manage': 'manageMarkerLayer',
+      'click .ph-form-submit': 'submitForm',
+      'change .ph-selected-file': 'manageSelectedFile'
     },
 
     initialize: function(){
@@ -50,6 +55,32 @@ $(function() {
         var marker = L.marker([data.lat, data.lng]);
 
         _this.mapData.markers = L.layerGroup([marker]);
+      });
+    },
+
+    submitForm: function() {
+      var form = this.$('.ph-form');
+
+      $(form).ajaxSubmit({
+        beforeSubmit: function(arr, $form, options) {
+          options.dataType = 'json';
+        },
+        success: function(responseData, textStatus) {
+          // console.log(responseData);
+        }
+      });
+    },
+
+    manageSelectedFile: function(event) {
+      var files = this.$('.ph-selected-file').get(0).files,
+          $fileName = this.$('.ph-file-name');
+
+      _.each(files, function(file, index) {
+        if (!file.type.match(/image.*/)) {
+          return;
+        }
+
+        $fileName.html(file.name);
       });
     }
 

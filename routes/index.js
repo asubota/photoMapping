@@ -34,10 +34,11 @@ exports.upload = function(req, res) {
           console.log('resized image to fit within 200x200px');
         });
 
-        res.send({
+        res.json({
           original: "/uploads/original/" + imageName,
           thumb: "/uploads/thumb/" + imageName
         });
+
       });
     }
   });
