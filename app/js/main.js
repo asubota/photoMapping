@@ -12,8 +12,6 @@ $(function() {
   $('.ui.checkbox').checkbox();
 
 
-
-
   var MapView = Backbone.View.extend({
     el: $('body'),
 
@@ -58,32 +56,53 @@ $(function() {
       });
     },
 
+    validate: function(files) {
+      var valid = true;
+
+      _.each(files, function(file, index) {
+        if (!file.type.match(/image.*/)) {
+          valid = false;
+        }
+      });
+
+      return valid;
+    },
+
     submitForm: function() {
-      var form = this.$('.ph-form');
+      var form = this.$('.ph-form'),
+        _this = this;
 
       $(form).ajaxSubmit({
         beforeSubmit: function(arr, $form, options) {
           options.dataType = 'json';
         },
         success: function(responseData, textStatus) {
-          // console.log(responseData);
+          _this.$('.ph-file-name').empty();
+          _this.hideError();
         }
       });
+    },
+
+    hideError: function() {
+      this.$('.ph-file-error').empty();
+    },
+
+    showError: function() {
+      this.$('.ph-file-error').html('wrong file');
     },
 
     manageSelectedFile: function(event) {
       var files = this.$('.ph-selected-file').get(0).files,
           $fileName = this.$('.ph-file-name');
 
-      _.each(files, function(file, index) {
-        if (!file.type.match(/image.*/)) {
-          return;
-        }
+      $fileName.html(files[0].name);
 
-        $fileName.html(file.name);
-      });
+      if (this.validate(files)) {
+        this.submitForm();
+      } else {
+        this.showError();
+      }
     }
-
   });
 
   var mapView = new MapView();

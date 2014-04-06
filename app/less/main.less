@@ -1,23 +1,27 @@
 body {
-	background-color: #d4d4d4;
+  background-color: #d4d4d4;
 }
 
 #wrap {
-	width: auto;
-	margin: 25px;
+  width: auto;
+  margin: 25px;
 
-	#map {
-		height: 500px;
-	}
+  #map {
+    height: 500px;
+  }
 
   .ph-button-wrap {
-    & + .ph-button-wrap {
-      margin-top: 5px;
-    }
-
     .ph-file-name {
-
+      margin-left: 10px;
     }
+  }
+
+  .ph-file-error {
+    color: #f00;
+    padding-right: 12px;
+    position: absolute;
+    right: 10px;
+    top: 24px;
   }
 
   .hidden-upload-field {
