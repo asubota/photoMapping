@@ -1,19 +1,22 @@
 var ExifImage = require('exif').ExifImage,
   when = require('when'),
   fs = require('fs'),
-  im = require('imagemagick');
+  path = require('path'),
+  im = require('imagemagick'),
+  scanDir = require('fs-readdir-recursive'),
+  _ = require('underscore');
 
 exports.index = function(req, res){
   res.send('Please, navigate to <a href="/index.html">index.html</a> page');
 };
 
 exports.upload = function(req, res) {
-  fs.readFile(req.files.image.path, function (err, data) {
+  fs.readFile(req.files.image.path, function(err, data) {
     var imageName = req.files.image.name,
         newPath,
         thumbPath;
 
-    if(!imageName){
+    if (!imageName) {
       console.log("There was an error")
       res.redirect("/index.html");
       res.end();
@@ -21,7 +24,7 @@ exports.upload = function(req, res) {
       newPath = __dirname + "/../uploads/original/" + imageName;
       thumbPath = __dirname + "/../uploads/thumb/" + imageName;
 
-      fs.writeFile(newPath, data, function (err) {
+      fs.writeFile(newPath, data, function(err) {
 
         im.resize({
           srcPath: newPath,
@@ -60,20 +63,25 @@ exports.showThumb = function(req, res) {
   res.end(img, 'binary');
 };
 
-exports.getCoords = function(req, res) {
-  var imgFile = 'uploads/original/test.jpg';
+exports.getData = function(req, res) {
+  __getData().then(function(geoDataArr) {
+    res.send(geoDataArr);
+  });
+}
 
-  __getCoords(imgFile).then(
-    function(data) {
-      res.send(data);
-    },
-    function(error) {
-        console.log(error);
-    }
-  );
-};
 
 /* private functions */
+__getData = function() {
+  var fileList = scanDir(path.join(__dirname, '/../uploads/thumb')),
+    deferreds = [];
+
+  _.each(fileList, function(filename, index) {
+    deferreds.push(__getCoords('uploads/original/' + filename));
+  });
+
+  return when.all(deferreds);
+}
+
 function __getCoords(imgFile) {
     var deferred = when.defer();
 

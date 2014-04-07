@@ -29,7 +29,7 @@ $(function() {
     initialize: function(){
       _.bindAll(this, 'render');
       this.render();
-      this.getMarkerData();
+      this.getData();
     },
 
     manageMarkerLayer: function(event) {
@@ -46,13 +46,20 @@ $(function() {
 
     },
 
-    getMarkerData: function() {
+    getData: function() {
       var _this = this;
 
-      $.getJSON('/getCoords', function(data) {
-        var marker = L.marker([data.lat, data.lng]);
+      $.getJSON('/getData', function(data) {
+        var markers = [];
 
-        _this.mapData.markers = L.layerGroup([marker]);
+        _.each(data, function(item, index) {
+          markers.push(L.marker([item.lat, item.lng]));
+        // var $img = $('<img>').attr('src', item.src).addClass('rounded ui image').attr('title', item.filename);
+        // _this.$('.ph-image-list').append($img);
+        });
+
+        _this.mapData.markers = L.layerGroup(markers);
+
       });
     },
 

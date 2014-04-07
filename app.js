@@ -24,7 +24,7 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
-app.get('/getCoords',  routes.getCoords);
+app.get('/getData',  routes.getData);
 
 app.get('/uploads/original/:file', routes.showFile);
 app.get('/uploads/thumb/:file', routes.showThumb);
