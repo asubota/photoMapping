@@ -111,6 +111,17 @@ module.exports = function(grunt) {
     watch: {
       files: ['<%= files.js.main %>', '<%= files.less %>', '<%= files.index %>'],
       tasks: ['jshint', 'uglify', 'less', 'concat', 'copy']
+    },
+
+    jasmine: {
+      pivotal: {
+        src: ['<%= files.js.main %>'],
+        options: {
+          specs: 'spec/javascripts/*Spec.js',
+          helpers: 'spec/javascripts/helpers/*.js',
+          vendor: '<%= files.js.vendor %>',
+        }
+      }
     }
 
   });
@@ -121,8 +132,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-jasmine');
 
   // Default task(s).
   grunt.registerTask('default', ['jshint', 'uglify', 'less', 'concat', 'copy']);
   grunt.registerTask('dev', ['watch']);
+  grunt.registerTask('test', ['jasmine']);
 };

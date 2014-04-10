@@ -1,3 +1,5 @@
+var app = app || {};
+
 $(function() {
 
   var map = L.map('map').setView([50.414124,30.522423], 13);
@@ -12,7 +14,7 @@ $(function() {
   $('.ui.checkbox').checkbox();
 
 
-  var MapView = Backbone.View.extend({
+  app.MapView = Backbone.View.extend({
     el: $('body'),
 
     mapData: {
@@ -112,6 +114,6 @@ $(function() {
     }
   });
 
-  var mapView = new MapView();
+  var mapView = new app.MapView();
 
 });
