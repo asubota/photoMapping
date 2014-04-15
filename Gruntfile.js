@@ -6,7 +6,11 @@ module.exports = function(grunt) {
 
     files: {
       js: {
-        main: 'app/js/main.js',
+        main: [
+          'app/js/models/*.js',
+          'app/js/*/*.js',
+          'app/js/*.js'
+        ],
         vendor: [
           'app/vendor/jquery-2.1.0.min.js',
           'app/vendor/underscore-min.js',

@@ -65,7 +65,7 @@ exports.showThumb = function(req, res) {
 
 exports.getData = function(req, res) {
   __getData().then(function(geoDataArr) {
-    res.send(geoDataArr);
+    res.json(geoDataArr);
   });
 }
 
