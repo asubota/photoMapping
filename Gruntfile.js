@@ -8,7 +8,8 @@ module.exports = function(grunt) {
       js: {
         main: [
           'app/js/models/*.js',
-          'app/js/*/*.js',
+          'app/js/collections/*.js',
+          'app/js/views/*.js',
           'app/js/*.js'
         ],
         vendor: [

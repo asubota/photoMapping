@@ -1,7 +1,10 @@
-var App = App || {};
-App.Model = App.Model || {};
+var app = app || {};
 
-
-App.Model.PhotoModel = Backbone.Model.extend({
-
+app.PhotoModel = Backbone.Model.extend({
+  defaults: {
+    filename: 'test.jpg',
+    src: '/../uploads/thumb/test.jpg',
+    lat: 50,
+    lng: 30
+  }
 });

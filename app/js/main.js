@@ -1,7 +1,5 @@
 $(function() {
 
-  var map;
-
   try {
     map = L.map('map').setView([50.414124,30.522423], 13);
     L.Icon.Default.imagePath = '/images';
@@ -15,6 +13,5 @@ $(function() {
   $('#content .menu .item').tab();
   $('.ui.checkbox').checkbox();
 
-  var photos = new App.Collection.PhotoCollection();
-
+  new app.AppView();
 });

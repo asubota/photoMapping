@@ -1,4 +1,5 @@
 var ExifImage = require('exif').ExifImage,
+  promise = require('promise'),
   when = require('when'),
   fs = require('fs'),
   path = require('path'),

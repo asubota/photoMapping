@@ -1,8 +1,6 @@
-var App = App || {};
-App.Collection = App.Collection || {};
+var app = app || {};
 
-
-App.Collection.PhotoCollection = Backbone.Collection.extend({
-  model: App.Model.PhotoModel,
-  url: '/getData'
+app.PhotoList = Backbone.Collection.extend({
+  model: app.PhotoModel,
+  url: '/getData',
 });
