@@ -24,9 +24,21 @@ body {
     top: 24px;
   }
 
-  .ph-image-list img {
-    float: left;
+  .ph-photo-wrap {
+    display: inline-block;
 
+    &:after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+
+    & + .ph-photo-wrap {
+      margin-left: 5px;
+    }
+  }
+
+  .ph-image-list img {
     & + img {
       margin-left: 10px;
     }

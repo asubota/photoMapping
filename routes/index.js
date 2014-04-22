@@ -1,5 +1,4 @@
 var ExifImage = require('exif').ExifImage,
-  promise = require('promise'),
   when = require('when'),
   fs = require('fs'),
   path = require('path'),
@@ -12,39 +11,34 @@ exports.index = function(req, res){
 };
 
 exports.upload = function(req, res) {
+
+  if (!!!req.files.image || !req.files.image.type.match(/image.*/)) {
+    return res.json({
+      status: false,
+      message: 'incorrect file'
+    });
+  };
+
   fs.readFile(req.files.image.path, function(err, data) {
     var imageName = req.files.image.name,
         newPath,
         thumbPath;
 
-    if (!imageName) {
-      console.log("There was an error")
-      res.redirect("/index.html");
-      res.end();
-    } else {
-      newPath = __dirname + "/../uploads/original/" + imageName;
-      thumbPath = __dirname + "/../uploads/thumb/" + imageName;
+    newPath = __dirname + "/../uploads/original/" + imageName;
+    thumbPath = __dirname + "/../uploads/thumb/" + imageName;
 
-      fs.writeFile(newPath, data, function(err) {
-
-        im.resize({
-          srcPath: newPath,
-          dstPath: thumbPath,
-          width:   150
-        }, function(err, stdout, stderr){
-          if (err) {
-            throw err;
-          }
-          console.log('resized image to fit within 200x200px');
+    fs.writeFile(newPath, data, function(err) {
+      im.resize({
+        srcPath: newPath,
+        dstPath: thumbPath,
+        width:   150
+      }, function(err, stdout, stderr){
+        when(__getCoords(imageName)).then(function(data) {
+          return res.json(data);
         });
-
-        res.json({
-          original: "/uploads/original/" + imageName,
-          thumb: "/uploads/thumb/" + imageName
-        });
-
       });
-    }
+    });
+
   });
 };
 
@@ -65,64 +59,79 @@ exports.showThumb = function(req, res) {
 };
 
 exports.getData = function(req, res) {
-  __getData().then(function(geoDataArr) {
-    res.json(geoDataArr);
+  when(__getData()).then(function(data) {
+    res.json( _.filter(data, function(item){
+      return !!item.src;
+    }));
   });
 }
+
 
 
 /* private functions */
 __getData = function() {
-  var fileList = scanDir(path.join(__dirname, '/../uploads/thumb')),
+  var deferred = when.defer();
+  var fileList = scanDir(path.join(__dirname, '/../uploads/original')),
     deferreds = [];
 
   _.each(fileList, function(filename, index) {
-    deferreds.push(__getCoords('uploads/original/' + filename));
+    deferreds.push(__getCoords(filename));
   });
 
-  return when.all(deferreds);
+  when.all(deferreds).then(function(data) {
+    deferred.resolve(data);
+  });
+
+  return deferred.promise;
 }
 
 function __getCoords(imgFile) {
-    var deferred = when.defer();
+  var deferred = when.defer(),
+    filePath = 'uploads/original/' + imgFile,
+    thumbPath = 'uploads/thumb/' + imgFile;
 
-    try {
-        new ExifImage({image : imgFile}, function (error, exifData) {
-            if (error) {
-                deferred.reject(new Error(error.message));
-            }
-            else {
-                deferred.resolve(calculate(exifData.gps));
-            }
-        });
-    } catch (error) {
-        deferred.reject(new Error(error.message));
+  new ExifImage({image : filePath}, function (error, exifData) {
+    if (error) {
+
+      fs.unlink(path.join(__dirname, '..', filePath), function(){});
+      fs.unlink(path.join(__dirname, '..', thumbPath), function(){});
+
+      deferred.resolve({
+        status: false,
+        message: 'no geo data'
+      });
+    } else {
+      deferred.resolve(_.extend(calculate(exifData.gps), {
+        filename: imgFile,
+        src: thumbPath
+      }));
+    }
+  });
+
+  function calculate(data) {
+    var GPSLat = data.GPSLatitude,
+      GPSLng = data.GPSLongitude,
+      GPSLatRef = data.GPSLatitudeRef,
+      GPSLngRef = data.GPSLongitudeRef,
+      result = {};
+
+    function parse(data) {
+      return data[0] + data[1]/60 + data[2]/3600;
     }
 
-    function calculate(data) {
-        var GPSLat = data.GPSLatitude,
-            GPSLng = data.GPSLongitude,
-            GPSLatRef = data.GPSLatitudeRef,
-            GPSLngRef = data.GPSLongitudeRef,
-            result = {};
+    result.lat = parse(GPSLat);
+    result.lng = parse(GPSLng);
 
-        function parse(data) {
-            return data[0] + data[1]/60 + data[2]/3600;
-        }
-
-        result.lat = parse(GPSLat);
-        result.lng = parse(GPSLng);
-
-        if (GPSLatRef.toLowerCase() === 's') {
-            result.lat = -1 * result.lat;
-        }
-
-        if (GPSLngRef.toLowerCase() === 'w') {
-            result.lng = -1 * result.lng;
-        }
-
-        return result;
+    if (GPSLatRef.toLowerCase() === 's') {
+      result.lat = -1 * result.lat;
     }
 
-    return deferred.promise;
+    if (GPSLngRef.toLowerCase() === 'w') {
+      result.lng = -1 * result.lng;
+    }
+
+    return result;
+  }
+
+  return deferred.promise;
 }
