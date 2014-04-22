@@ -29,7 +29,7 @@ app.AppView = Backbone.View.extend({
     $('.ph-file-error').empty();
     this.$('form').ajaxSubmit({
       success: function(responseData, textStatus) {
-        if (_.has(responseData, status)) {
+        if (_.has(responseData, 'status')) {
            $('.ph-file-error').html(responseData.message);
         } else {
           _this.collection.add(responseData);
