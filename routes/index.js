@@ -6,9 +6,6 @@ var ExifImage = require('exif').ExifImage,
   scanDir = require('fs-readdir-recursive'),
   _ = require('underscore');
 
-exports.index = function(req, res){
-  res.send('Please, navigate to <a href="/index.html">index.html</a> page');
-};
 
 exports.upload = function(req, res) {
 
@@ -40,22 +37,6 @@ exports.upload = function(req, res) {
     });
 
   });
-};
-
-exports.showFile = function(req, res) {
-  var file = req.params.file,
-    img = fs.readFileSync(__dirname + "/../uploads/original/" + file);
-
-  res.writeHead(200, {'Content-Type': 'image/jpg' });
-  res.end(img, 'binary');
-};
-
-exports.showThumb = function(req, res) {
-  var file = req.params.file,
-    img = fs.readFileSync(__dirname + "/../uploads/thumb/" + file);
-
-  res.writeHead(200, {'Content-Type': 'image/jpg' });
-  res.end(img, 'binary');
 };
 
 exports.getData = function(req, res) {

@@ -16,20 +16,21 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.methodOverride());
 app.use(app.router);
+
 app.use(express.static(path.join(__dirname, 'build')));
+app.use(express.static(path.join(__dirname, 'uploads')));
 
 // development only
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/', routes.index);
-app.get('/getData',  routes.getData);
+app.get('/', function(req, res) {
+	res.redirect('/index.html');
+});
 
-app.get('/uploads/original/:file', routes.showFile);
-app.get('/uploads/thumb/:file', routes.showThumb);
-
-app.post('/upload',  routes.upload);
+app.get('/photos',  routes.getData);
+app.post('/photos',  routes.upload);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
