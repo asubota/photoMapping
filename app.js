@@ -25,12 +25,12 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/', function(req, res) {
-	res.redirect('/index.html');
-});
+app.get('/photos',  routes.getPhotos);
+app.post('/photos',  routes.uploadPhoto);
 
-app.get('/photos',  routes.getData);
-app.post('/photos',  routes.upload);
+app.use(function(req, res, next){
+  res.send(404, 'Sorry cant find that! Visit root.');
+});
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

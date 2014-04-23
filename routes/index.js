@@ -7,8 +7,13 @@ var ExifImage = require('exif').ExifImage,
   _ = require('underscore');
 
 
-exports.upload = function(req, res) {
+var THUMB_PATH = 'thumb/';
+var ORIGIN_PATH = 'original/';
+var UPLOAD_DIR = '../uploads/';
 
+
+
+exports.uploadPhoto = function(req, res) {
   if (!!!req.files.image || !req.files.image.type.match(/image.*/)) {
     return res.json({
       status: false,
@@ -18,101 +23,113 @@ exports.upload = function(req, res) {
 
   fs.readFile(req.files.image.path, function(err, data) {
     var imageName = req.files.image.name,
-        newPath,
-        thumbPath;
+      originFilePath = path.join(__dirname, UPLOAD_DIR, ORIGIN_PATH, imageName),
+      thumbFilePath = path.join(__dirname, UPLOAD_DIR, THUMB_PATH, imageName)
 
-    newPath = __dirname + "/../uploads/original/" + imageName;
-    thumbPath = __dirname + "/../uploads/thumb/" + imageName;
-
-    fs.writeFile(newPath, data, function(err) {
+    fs.writeFile(originFilePath, data, function(err) {
       im.resize({
-        srcPath: newPath,
-        dstPath: thumbPath,
-        width:   150
+        srcPath: originFilePath,
+        dstPath: thumbFilePath,
+        strip : false,
+        width : 125,
+        height : '125^',
+        customArgs: [
+          '-gravity', 'center',
+          '-extent', '125x125'
+        ]
       }, function(err, stdout, stderr){
-        when(__getCoords(imageName)).then(function(data) {
+
+        when(getFileDataByName(imageName)).then(function(data) {
           return res.json(data);
         });
+
       });
     });
 
   });
 };
 
-exports.getData = function(req, res) {
-  when(__getData()).then(function(data) {
-    res.json( _.filter(data, function(item){
-      return !!item.src;
-    }));
+exports.getPhotos = function(req, res) {
+  when(getPhotosData()).then(function(data) {
+    res.json(data);
   });
 }
 
 
 
 /* private functions */
-__getData = function() {
-  var deferred = when.defer();
-  var fileList = scanDir(path.join(__dirname, '/../uploads/original')),
+function getPhotosData () {
+  var fileList = scanDir(path.join(__dirname, UPLOAD_DIR, ORIGIN_PATH)),
+    deferred = when.defer(),
     deferreds = [];
 
-  _.each(fileList, function(filename, index) {
-    deferreds.push(__getCoords(filename));
+  _.each(fileList, function(imageName) {
+    deferreds.push(getFileDataByName(imageName));
   });
 
   when.all(deferreds).then(function(data) {
-    deferred.resolve(data);
+    // return item with geo data
+    var filteredData = _.filter(data, function(item) {
+      return !!item.lat;
+    });
+
+    deferred.resolve(filteredData);
   });
 
   return deferred.promise;
 }
 
-function __getCoords(imgFile) {
+function getFileDataByName(imageName) {
   var deferred = when.defer(),
-    filePath = 'uploads/original/' + imgFile,
-    thumbPath = 'uploads/thumb/' + imgFile;
+    originFilePath = path.join(__dirname, UPLOAD_DIR, ORIGIN_PATH, imageName),
+    thumbFilePath = path.join(__dirname, UPLOAD_DIR, THUMB_PATH, imageName);
 
-  new ExifImage({image : filePath}, function (error, exifData) {
+  new ExifImage({image : originFilePath}, function (error, exifData) {
     if (error) {
 
-      fs.unlink(path.join(__dirname, '..', filePath), function(){});
-      fs.unlink(path.join(__dirname, '..', thumbPath), function(){});
+      fs.unlink(originFilePath, function() {});
+      fs.unlink(thumbFilePath, function() {});
 
       deferred.resolve({
         status: false,
         message: 'no geo data'
       });
     } else {
-      deferred.resolve(_.extend(calculate(exifData.gps), {
-        filename: imgFile,
-        src: thumbPath
+      deferred.resolve(_.extend(geoLocationParse(exifData.gps), {
+        filename: imageName,
+        src: path.join(THUMB_PATH, imageName)
       }));
     }
   });
 
-  function calculate(data) {
-    var GPSLat = data.GPSLatitude,
-      GPSLng = data.GPSLongitude,
-      GPSLatRef = data.GPSLatitudeRef,
-      GPSLngRef = data.GPSLongitudeRef,
-      result = {};
+  return deferred.promise;
+}
 
-    function parse(data) {
-      return data[0] + data[1]/60 + data[2]/3600;
-    }
+function geoLocationParse(data) {
+  var GPSLat = data.GPSLatitude,
+    GPSLng = data.GPSLongitude,
+    GPSLatRef = data.GPSLatitudeRef,
+    GPSLngRef = data.GPSLongitudeRef,
+    result = {};
 
-    result.lat = parse(GPSLat);
-    result.lng = parse(GPSLng);
-
-    if (GPSLatRef.toLowerCase() === 's') {
-      result.lat = -1 * result.lat;
-    }
-
-    if (GPSLngRef.toLowerCase() === 'w') {
-      result.lng = -1 * result.lng;
-    }
-
-    return result;
+  function parse(data) {
+    return data[0] + data[1]/60 + data[2]/3600;
   }
 
-  return deferred.promise;
+  result.lat = parse(GPSLat);
+  result.lng = parse(GPSLng);
+
+  if (GPSLatRef.toLowerCase() === 's') {
+    result.lat = -1 * result.lat;
+  }
+
+  if (GPSLngRef.toLowerCase() === 'w') {
+    result.lng = -1 * result.lng;
+  }
+
+  return result;
+}
+
+var cl = function(x) {
+  console.log(x);
 }
