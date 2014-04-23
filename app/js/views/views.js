@@ -41,6 +41,51 @@ app.AppView = Backbone.View.extend({
   }
 });
 
+app.ModalView = Backbone.View.extend({
+  template: _.template($('.ph-modal-template').html()),
+
+  initialize: function(data) {
+    this.data = {
+      src: data.src,
+      filename: data.filename
+    };
+
+    this.render();
+  },
+
+  render: function() {
+    this.$el.html(this.template(this.data));
+    $('body').append(this.el);
+
+    return this;
+  },
+
+  unrender: function() {
+    this.remove();
+    $('.ui.modal').remove();
+  },
+
+  show: function() {
+    var _this = this,
+      result = new $.Deferred();
+
+    $('.ui.modal').modal('setting', {
+      closable: false,
+      onDeny : function(){
+        result.reject();
+        _this.unrender();
+      },
+      onApprove : function() {
+        result.resolve();
+        _this.unrender();
+      }
+    }).modal('show');
+
+    return result.promise();
+  }
+
+});
+
 app.PhotoView = Backbone.View.extend({
   tagName: 'div',
   className: 'ph-photo-wrap',
@@ -63,8 +108,10 @@ app.PhotoView = Backbone.View.extend({
   tryRemove: function() {
     var _this = this;
 
-    this.model.destroy().done(function() {
-      _this.remove();
+    new app.ModalView(this.model.toJSON()).show().done(function() {
+      _this.model.destroy().done(function() {
+        _this.remove();
+      });
     });
   },
 
