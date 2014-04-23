@@ -55,7 +55,25 @@ exports.getPhotos = function(req, res) {
   });
 }
 
+exports.deletePhoto = function(req, res) {
+  var imageName = req.params.imageName;
 
+  if (!!imageName) {
+    deleteFiles(imageName);
+  }
+
+  res.json({
+    message: 'success'
+  });
+}
+
+function deleteFiles(imageName) {
+  var originFilePath = path.join(__dirname, UPLOAD_DIR, ORIGIN_PATH, imageName),
+    thumbFilePath = path.join(__dirname, UPLOAD_DIR, THUMB_PATH, imageName);
+
+  fs.unlink(originFilePath, function() {});
+  fs.unlink(thumbFilePath, function() {});
+}
 
 /* private functions */
 function getPhotosData () {
@@ -81,14 +99,12 @@ function getPhotosData () {
 
 function getFileDataByName(imageName) {
   var deferred = when.defer(),
-    originFilePath = path.join(__dirname, UPLOAD_DIR, ORIGIN_PATH, imageName),
-    thumbFilePath = path.join(__dirname, UPLOAD_DIR, THUMB_PATH, imageName);
+    originFilePath = path.join(__dirname, UPLOAD_DIR, ORIGIN_PATH, imageName);
 
   new ExifImage({image : originFilePath}, function (error, exifData) {
     if (error) {
 
-      fs.unlink(originFilePath, function() {});
-      fs.unlink(thumbFilePath, function() {});
+      deleteFiles(imageName);
 
       deferred.resolve({
         status: false,

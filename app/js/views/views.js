@@ -4,7 +4,8 @@ app.AppView = Backbone.View.extend({
   el: '#wrap',
 
   events: {
-    'change .ph-selected-file': 'manageSelectedFile'
+    'change .ph-selected-file': 'manageSelectedFile',
+
   },
 
   initialize: function() {
@@ -43,7 +44,29 @@ app.AppView = Backbone.View.extend({
 app.PhotoView = Backbone.View.extend({
   tagName: 'div',
   className: 'ph-photo-wrap',
-  template: _.template('<img src="<%= src %>" title="<%= filename %>" class="rounded ui image">'),
+  template: _.template($('.ph-photo-wrap-template').html()),
+
+  events: {
+    'mouseenter': 'mouseenter',
+    'mouseleave': 'mouseleave',
+    'click .trash': 'tryRemove'
+  },
+
+  mouseleave: function() {
+    this.$('img').removeClass('disabled');
+  },
+
+  mouseenter: function() {
+    this.$('img').addClass('disabled');
+  },
+
+  tryRemove: function() {
+    var _this = this;
+
+    this.model.destroy().done(function() {
+      _this.remove();
+    });
+  },
 
   render: function() {
     this.$el.html(this.template(this.model.toJSON()));

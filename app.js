@@ -27,6 +27,7 @@ if ('development' == app.get('env')) {
 
 app.get('/photos',  routes.getPhotos);
 app.post('/photos',  routes.uploadPhoto);
+app.delete('/photos/:imageName', routes.deletePhoto);
 
 app.use(function(req, res, next){
   res.send(404, 'Sorry cant find that! Visit root.');

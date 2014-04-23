@@ -25,6 +25,7 @@ body {
   }
 
   .ph-photo-wrap {
+    position: relative;
     display: inline-block;
 
     &:after {
@@ -36,11 +37,31 @@ body {
     & + .ph-photo-wrap {
       margin-left: 5px;
     }
-  }
 
-  .ph-image-list img {
-    & + img {
-      margin-left: 10px;
+    .ph-image-options {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      visibility: hidden;
+
+      .icon {
+        &.trash {
+          font-size: 1.2em;
+          color: #000;
+          cursor: pointer;
+
+          &:hover {
+            color: #f00;
+
+            .scale-mixin();
+            .transition-mixin();
+          }
+        }
+      }
+    }
+
+    &:hover .ph-image-options {
+      visibility: visible;
     }
   }
 
@@ -55,4 +76,20 @@ body {
       font-size: 0;
     }
   }
+}
+
+.scale-mixin(@coef: 1.5) {
+  -webkit-transform: scale(@coef);
+  -moz-transform: scale(@coef);
+  -o-transform: scale(@coef);
+  -ms-transform: scale(@coef);
+  transform: scale(@coef);
+}
+
+.transition-mixin(@time: 0.2s) {
+  -webkit-transition: all @time ease-out;
+  -moz-transition: all @time ease-out;
+  -o-transition: all @time ease-out;
+  -ms-transition: all @time ease-out;
+  transition: all @time ease-out;
 }
