@@ -5,6 +5,17 @@ app.AppView = Backbone.View.extend({
 
   events: {
     'change .ph-selected-file': 'manageSelectedFile',
+    'click .icon.marker': 'manageMarker'
+  },
+
+  manageMarker: function(event) {
+    var el = event.target,
+      marker_id = el.dataset.marker_id,
+      marker = this.markers.getLayer(marker_id),
+      opacity = !!marker.options.opacity?0:1;
+
+    marker.setOpacity(opacity);
+    $(el).toggleClass('red', marker.options.opacity);
   },
 
   initialize: function(data) {
@@ -15,18 +26,18 @@ app.AppView = Backbone.View.extend({
     this.listenTo(this.collection, 'add', this.addOnePhoto);
     this.collection.fetch();
 
-    this.on('marker:add', this.markerAdd, this);
+    this.markers = L.layerGroup().addTo(this.map);
   },
 
   addOnePhoto: function(model) {
-    var view = new app.PhotoView({model: model});
+    var marker = L.marker([model.get('lat'), model.get('lng')]).bindPopup(model.get('filename')),
+      view;
 
+    this.markers.addLayer(marker);
+    model.marker_id = marker._leaflet_id;
+
+    view = new app.PhotoView({model: model});
     this.$photos.append(view.render().el);
-    this.trigger('marker:add', model.toJSON());
-  },
-
-  markerAdd: function(data) {
-    L.marker([data.lat, data.lng]).addTo(this.map).bindPopup(data.filename);
   },
 
   manageSelectedFile: function(event) {
@@ -44,7 +55,6 @@ app.AppView = Backbone.View.extend({
         }
       }
     });
-
   }
 });
 
@@ -101,7 +111,7 @@ app.PhotoView = Backbone.View.extend({
   events: {
     'mouseenter': 'mouseenter',
     'mouseleave': 'mouseleave',
-    'click .trash': 'tryRemove'
+    'click .icon.trash': 'tryRemove'
   },
 
   mouseleave: function() {
@@ -123,7 +133,11 @@ app.PhotoView = Backbone.View.extend({
   },
 
   render: function() {
-    this.$el.html(this.template(this.model.toJSON()));
+    var data = _.extend(this.model.toJSON(), {
+      marker_id: this.model.marker_id
+    });
+
+    this.$el.html(this.template(data));
 
     return this;
   }
