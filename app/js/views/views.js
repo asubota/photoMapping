@@ -5,21 +5,28 @@ app.AppView = Backbone.View.extend({
 
   events: {
     'change .ph-selected-file': 'manageSelectedFile',
-
   },
 
-  initialize: function() {
+  initialize: function(data) {
+    this.map = data.map;
     this.$photos = this.$('.ph-image-list');
-    this.collection = new app.PhotoList();
 
+    this.collection = new app.PhotoList();
     this.listenTo(this.collection, 'add', this.addOnePhoto);
     this.collection.fetch();
+
+    this.on('marker:add', this.markerAdd, this);
   },
 
   addOnePhoto: function(model) {
     var view = new app.PhotoView({model: model});
 
     this.$photos.append(view.render().el);
+    this.trigger('marker:add', model.toJSON());
+  },
+
+  markerAdd: function(data) {
+    L.marker([data.lat, data.lng]).addTo(this.map).bindPopup(data.filename);
   },
 
   manageSelectedFile: function(event) {

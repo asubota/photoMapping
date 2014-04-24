@@ -10,5 +10,5 @@ $(function() {
   $('#content .menu .item').tab();
   $('.ui.checkbox').checkbox();
 
-  new app.AppView();
+  new app.AppView({map: map});
 });
